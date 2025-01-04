@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -36,7 +36,7 @@ func getCPUInfo() (CPUInfo, error) {
 }
 
 func getCPUTemperature() (float64, error) {
-	data, err := ioutil.ReadFile("/sys/class/thermal/thermal_zone0/temp")
+	data, err := os.ReadFile("/sys/class/thermal/thermal_zone0/temp")
 	if err != nil {
 		return 0, err
 	}
