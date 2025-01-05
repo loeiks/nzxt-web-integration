@@ -13,28 +13,30 @@ const chartConfig = {
     },
 }
 
-function StatusChart({ chartData: initialData, position: initialPosition = "left", sign = "°" }: { chartData: { name: string, value: number, fill: string }[], position?: "left" | "right", sign: "°" | "%" }) {
+function StatusChart({ chartData: initialData, position: initialPosition = "left", sign = "°" }: { chartData: { value: number, fill: string }[], position?: "left" | "right", sign: "°" | "%" }) {
     const [chartData, setChartData] = useState(initialData);
     const [alignment, setAlignment] = useState([-90, 90, 15]);
-    const [chartMargin, setChartMargin] = useState("ml-[100px]");
+    const [currentCx, setCurrentCx] = useState("0");
 
     useEffect(() => {
         setChartData(initialData);
 
         if (initialPosition == "left") {
-            setAlignment([270, 90, 20])
-            setChartMargin("ml-[-150px]")
+            setAlignment([270, 90, 20]);
+            setCurrentCx("96%");
         } else if (initialPosition == "right") {
-            setAlignment([-90, 90, -20])
-            setChartMargin("ml-[150px]")
+            setAlignment([-90, 90, -20]);
+            setCurrentCx("6%");
         }
     }, [initialData, initialPosition]);
 
     return (
-        <ChartContainer config={chartConfig} className={`absolute min-h-[500px] ${chartMargin}`}>
-            <ResponsiveContainer width={"100%"} height={"100%"}>
-                <PieChart>
+        <ChartContainer config={chartConfig} className={`min-h-[500px]`}>
+            <ResponsiveContainer height={"100%"}>
+                <PieChart
+                width={500}>
                     <Pie
+                        cx={currentCx}
                         dataKey="default"
                         data={[{ default: 100 }]}
                         startAngle={alignment[0]}
@@ -45,6 +47,7 @@ function StatusChart({ chartData: initialData, position: initialPosition = "left
                         <Cell fill="hsl(var(--chart-2))" />
                     </Pie>
                     <Pie
+                        cx={currentCx}
                         dataKey="value"
                         data={chartData}
                         startAngle={alignment[0]}
