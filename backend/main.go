@@ -18,7 +18,6 @@ type CPUInfo struct {
 }
 
 func getCPUInfo() (CPUInfo, error) {
-	// Get CPU usage percentage
 	percentages, err := cpu.Percent(time.Second, false)
 	if err != nil {
 		return CPUInfo{}, err
@@ -47,7 +46,6 @@ func getCPUTemperature() (float64, error) {
 		return 0, err
 	}
 
-	// Convert from millidegree Celsius to degree Celsius
 	return float64(tempMilliCelsius) / 1000.0, nil
 }
 func cpuHandler(w http.ResponseWriter, r *http.Request) {
