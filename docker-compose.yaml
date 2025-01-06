@@ -16,5 +16,7 @@ services:
     environment:
       - PORT=8080
     volumes:
-      - ./backend:/app
+      - type: bind
+        source: ./backend
+        target: /app
     restart: unless-stopped
