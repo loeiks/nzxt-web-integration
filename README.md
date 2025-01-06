@@ -19,5 +19,6 @@ Next goals and todos for this project are:
 - [ ] Setup GitHub actions to deploy new versions automatically.
 - [ ] Setup small admin dashboard (without authentication) to manage colors.
 - [ ] Add different presets and switch between them via admin dashboard.
+- [ ] Add lazy loading feature for containers to stop them when screen has turned off.
 
 ---
