@@ -5,7 +5,7 @@ import { toggleSource, updatePCData, updateS1Data } from './store/cpuSlice';
 import StatusChart from './components/StatusChart';
 import { type MonitoringData } from "@nzxt/web-integrations-types/v1";
 
-const ws = new WebSocket("/cpu");
+const ws = new WebSocket("http://192.168.178.18/cpu");
 
 const Status = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -56,7 +56,7 @@ const Status = () => {
                 <div className='col-start-1 col-end-2 place-self-center'>
                     <StatusChart data={currentSource === "PC" ? pcData.temp : s1Data.temp} sign="°" />
                 </div>
-                <h1 className='col-start-2 place-self-center text-5xl text-white font-bold text-center mb-[18px] min-w-[20px]'>{currentSource}</h1>
+                <h1 className='col-start-2 place-self-center text-5xl text-white opacity-65 text-center min-w-[24px] mb-[16px]'>{currentSource}</h1>
                 <div className='col-start-3 col-end-4 place-self-center'>
                     <StatusChart data={currentSource === "PC" ? pcData.usage : s1Data.usage} sign="%" />
                 </div>

@@ -15,7 +15,7 @@ type StatusChartType = { sign: "°" | "%", data: number };
 
 function StatusChart({ sign, data }: StatusChartType) {
     // If sign is ° it's mean we are showing temp and it should stay on left side.
-    const alignment = sign === "°" ? [270, 90, 20] : [-90, 90, -20];
+    const alignment = sign === "°" ? [270, 90, 24] : [-90, 90, -24];
     const currentCx = sign === "°" ? "96%" : "6%";
 
     const chartData = [
@@ -61,7 +61,7 @@ function StatusChart({ sign, data }: StatusChartType) {
                                             <tspan // @ts-ignore
                                                 x={viewBox.cx - alignment[2]} // @ts-ignore
                                                 y={viewBox.cy + 3}
-                                                className="text-7xl font-bold fill-white"
+                                                className="text-7xl font-bold fill-white text-center"
                                             >
                                                 {data.toString() + sign}
                                             </tspan>
