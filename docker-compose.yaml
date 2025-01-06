@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "80:80" # Expose frontend port
+    depends_on:
+      - backend
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8080" # Backend port is exposed within the docker network
+    environment:
+      - PORT=8080
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
