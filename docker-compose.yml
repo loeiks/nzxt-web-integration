@@ -15,9 +15,9 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: backend
+    ports:
+      - "8080:8080"
     restart: always
-    expose:
-      - "80"
 
   nginx:
     image: nginx:latest
