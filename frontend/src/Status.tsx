@@ -5,7 +5,8 @@ import { toggleSource, updatePCData, updateS1Data } from './store/cpuSlice';
 import StatusChart from './components/StatusChart';
 import { type MonitoringData } from "@nzxt/web-integrations-types/v1";
 
-const ws = new WebSocket("http://192.168.178.18/cpu");
+// const ws = new WebSocket("http://192.168.178.18/cpu");
+const ws = new WebSocket("/cpu");
 
 const Status = () => {
     const dispatch = useDispatch<AppDispatch>();
