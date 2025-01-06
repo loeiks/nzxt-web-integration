@@ -89,7 +89,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 // Start WS Server
 func main() {
 	http.HandleFunc("/cpu", wsHandler)
-	port := ":8080"
+	port := ":80"
 
 	log.Printf("Starting WebSocket server on port %s...\n", port)
 	if err := http.ListenAndServe(port, nil); err != nil {
