@@ -3,8 +3,11 @@ FROM golang:1.23.4 AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
+
 COPY . .
 RUN go build -o main .
+
+RUN go env -w CGO_ENABLED=1
 FROM debian:bullseye
 WORKDIR /root/
 COPY --from=builder /app/main .
