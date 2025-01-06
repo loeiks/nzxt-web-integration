@@ -51,9 +51,9 @@ const Status = () => {
         };
     }, [currentSource, dispatch]);
 
-    return (
-        <div className="flex flex-row items-center justify-center h-[100vh]">
-            <div className='grid grid-cols-[auto,1fr,auto] h-auto items-center gap-[30px]'>
+    return ( // There is weird gap that I don't understand why yet so I close it with margin for now...
+        <div className="flex flex-row justify-center h-[100vh] w-full ml-[-11px]">
+            <div className='grid grid-cols-[auto,1fr,auto] h-full items-center gap-[30px]'>
                 <div className='col-start-1 col-end-2 place-self-center'>
                     <StatusChart data={currentSource === "PC" ? pcData.temp : s1Data.temp} sign="°" />
                 </div>

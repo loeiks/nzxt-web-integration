@@ -85,5 +85,11 @@
 
 body {
   margin: 0;
+  padding: 0;
   background-color: #202020;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
 }
