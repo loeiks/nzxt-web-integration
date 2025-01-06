@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -9,12 +8,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/shirou/gopsutil/cpu"
 )
 
 type CPUInfo struct {
 	Temperature float64 `json:"temperature"`
 	Usage       float64 `json:"usage"`
+}
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true // Allow all origins
+	},
 }
 
 func getCPUInfo() (CPUInfo, error) {
@@ -25,7 +31,8 @@ func getCPUInfo() (CPUInfo, error) {
 
 	temperature, err := getCPUTemperature()
 	if err != nil {
-		log.Fatalf("Error fetching CPU temperature: %v", err)
+		log.Printf("Error fetching CPU temperature: %v", err)
+		return CPUInfo{}, err
 	}
 
 	return CPUInfo{
@@ -48,23 +55,42 @@ func getCPUTemperature() (float64, error) {
 
 	return float64(tempMilliCelsius) / 1000.0, nil
 }
-func cpuHandler(w http.ResponseWriter, r *http.Request) {
-	cpuInfo, err := getCPUInfo()
+
+// wsHandler handles WebSocket connections and sends real-time CPU data
+func wsHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Failed to upgrade connection: %v\n", err)
 		return
 	}
+	defer conn.Close()
 
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(cpuInfo)
+	log.Println("New WebSocket client connected")
+
+	// Create a ticker for periodic updates
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		cpuInfo, err := getCPUInfo()
+		if err != nil {
+			log.Printf("Error fetching CPU info: %v\n", err)
+			continue
+		}
+
+		err = conn.WriteJSON(cpuInfo)
+		if err != nil {
+			log.Printf("Error sending data to client: %v\n", err)
+			return
+		}
+	}
 }
 
 func main() {
-	http.HandleFunc("/cpu", cpuHandler)
+	http.HandleFunc("/cpu", wsHandler)
 	port := ":8080"
 
-	log.Printf("Starting server on port %s...\n", port)
+	log.Printf("Starting WebSocket server on port %s...\n", port)
 	if err := http.ListenAndServe(port, nil); err != nil {
 		log.Fatalf("Server failed to start: %v\n", err)
 	}
