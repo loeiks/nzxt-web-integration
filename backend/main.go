@@ -68,7 +68,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("New WebSocket client connected")
 
 	// Create a ticker for periodic updates
-	ticker := time.NewTicker(3 * time.Second)
+	ticker := time.NewTicker(2 * time.Second)
 	defer ticker.Stop()
 
 	for range ticker.C {

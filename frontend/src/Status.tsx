@@ -1,147 +1,66 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from './store';
+import { toggleSource, updatePCData, updateS1Data } from './store/cpuSlice';
 import StatusChart from './components/StatusChart';
-import { MonitoringData } from '@nzxt/web-integrations-types/v1';
-import axios from 'axios';
+import { type MonitoringData } from "@nzxt/web-integrations-types/v1";
+
+const ws = new WebSocket("ws://192.168.178.18:8080/cpu");
 
 const Status = () => {
-    const [pcData, setPcData] = useState<{
-        temp: { value: number; fill: string }[];
-        usage: { value: number; fill: string }[];
-    } | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
+    const { currentSource, pcData, s1Data } = useSelector((state: RootState) => state.cpu);
 
-    const [s1Data, setS1Data] = useState<{
-        temp: { value: number; fill: string }[];
-        usage: { value: number; fill: string }[];
-    } | null>(null);
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            dispatch(toggleSource());
+        }, 12000);
 
-    const [currentData, setCurrentData] = useState<{
-        temp: { value: number; fill: string }[];
-        usage: { value: number; fill: string }[];
-    } | null>(null);
+        return () => clearInterval(intervalId);
+    }, [dispatch]);
 
-    const [currentState, setCurrentState] = useState<"PC" | "S1">("PC");
-    
-    const stateIntervalRef = useRef<NodeJS.Timeout | null>(null);
-    const callIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    useEffect(() => {
+        if (currentSource === "S1") {
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                dispatch(updateS1Data({ temp: Number(data.temperature.toFixed(0)), usage: Number(data.usage.toFixed(0)) }));
+            };
 
-    const handleMonitoringDataUpdate = useCallback(
-        (data: MonitoringData) => {
-            const { cpus } = data;
-
-            if (
-                !pcData ||
-                pcData.temp[0].value !== (cpus[0]?.temperature ?? 0) ||
-                pcData.usage[0].value !== (cpus[0]?.load ?? 0)
-            ) {
-                setPcData({
-                    temp: [
-                        {
-                            value: Number(cpus[0]?.temperature?.toFixed(0)),
-                            fill: 'hsl(var(--chart-1))',
-                        },
-                        {
-                            value: 100 - Number(cpus[0]?.temperature?.toFixed(0)),
-                            fill: 'hsl(var(--chart-2))',
-                        },
-                    ],
-                    usage: [
-                        {
-                            value: Number(((cpus[0].load || 0) * 100).toFixed(0)),
-                            fill: 'hsl(var(--chart-1))',
-                        },
-                        {
-                            value: 100 - Number(((cpus[0].load || 0) * 100).toFixed(0)),
-                            fill: 'hsl(var(--chart-2))',
-                        },
-                    ],
-                });
-            }
-        },
-        [pcData]
-    );
+            ws.onclose = () => {
+                console.warn("WebSocket connection closed");
+            };
+        }
+    }, [currentSource, dispatch]);
 
     useEffect(() => {
         window.nzxt = {
             v1: {
-                onMonitoringDataUpdate: handleMonitoringDataUpdate,
+                onMonitoringDataUpdate: (data: MonitoringData) => {
+                    const cpu = data.cpus[0];
+
+                    if (currentSource === "PC") {
+                        dispatch(updatePCData({ temp: Number((cpu.temperature || 0).toFixed(0)), usage: Number(((cpu.load || 0) * 100).toFixed(0)) }));
+                    }
+                },
                 height: 640,
                 width: 640,
-                shape: 'circle',
-                targetFps: 30,
-            },
-        };
-    }, [handleMonitoringDataUpdate]);
-
-    // Animate State in Every 10s (useEffect for performance and unexpected breakage)
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            if (currentState === "PC") {
-                setCurrentState("S1");
-            } else {
-                setCurrentState("PC")
-            }
-        }, 10 * 1000)
-
-        stateIntervalRef.current = intervalId;
-
-        return () => {
-            if (stateIntervalRef.current) {
-                clearInterval(stateIntervalRef.current);
+                shape: "circle",
+                targetFps: 30
             }
         };
-    }, []);
-
-    useEffect(() => {
-        if (currentState === "PC") {
-            setCurrentData(pcData);
-        } else if (currentState === "S1") {
-            setCurrentData(s1Data);
-        }
-    }, [currentState])
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                if (currentState === "S1") {
-                    const response = await axios.get('/api/cpu');
-                    setS1Data(response.data);
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        const intervalId = setInterval(fetchData, 1000);
-        callIntervalRef.current = intervalId;
-
-        fetchData();
-
-        return () => {
-            if (callIntervalRef.current) {
-                clearInterval(callIntervalRef.current);
-            }
-        };
-    }, []);
+    }, [currentSource, dispatch]);
 
     return (
         <div className="flex flex-row items-center justify-center h-[100vh]">
-            {
-                currentData ? (
-                    <>
-                        <div className='grid grid-cols-[auto,1fr,auto] h-auto items-center gap-[30px]'>
-                            <div className='col-start-1 col-end-2 place-self-center'>
-                                <StatusChart chartData={currentData.temp} position="left" sign="°" />
-                            </div>
-                            <h1 className='col-start-2 place-self-center text-5xl text-white font-bold text-center mb-[18px] min-w-[20px]'>{currentState}</h1>
-                            <div className='col-start-3 col-end-4 place-self-center'>
-                                <StatusChart chartData={currentData.usage} position="right" sign="%" />
-                            </div>
-                        </div>
-                    </>
-                ) : (
-                    <div className="flex items-center justify-center text-white text-xl font-sans font-normal">Loading...</div>
-                )
-            }
+            <div className='grid grid-cols-[auto,1fr,auto] h-auto items-center gap-[30px]'>
+                <div className='col-start-1 col-end-2 place-self-center'>
+                    <StatusChart data={currentSource === "PC" ? pcData.temp : s1Data.temp} sign="°" />
+                </div>
+                <h1 className='col-start-2 place-self-center text-5xl text-white font-bold text-center mb-[18px] min-w-[20px]'>{currentSource}</h1>
+                <div className='col-start-3 col-end-4 place-self-center'>
+                    <StatusChart data={currentSource === "PC" ? pcData.usage : s1Data.usage} sign="%" />
+                </div>
+            </div>
         </div>
     );
 };
