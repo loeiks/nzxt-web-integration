@@ -112,7 +112,11 @@ Problem: when usage or temp is lower than 13-14 (that number depends on the char
 
 Example of what I was talking about;
 
-![alt text](https://raw.githubusercontent.com/loeiks/nzxt-web-integration/refs/heads/main/image.png)
+![BUG in Chart](https://raw.githubusercontent.com/loeiks/nzxt-web-integration/refs/heads/main/image.png)
+
+Then I have fixed this problem by changing radius of the chart to 10 from 99 xd. ([https://github.com/recharts/recharts/issues/1972](https://github.com/recharts/recharts/issues/1972))
+
+![BUG Fixes in Chart](https://raw.githubusercontent.com/loeiks/nzxt-web-integration/refs/heads/main/preview.png)
 
 ### I Hate Frontend Development
 

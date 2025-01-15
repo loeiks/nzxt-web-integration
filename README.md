@@ -23,4 +23,6 @@ Next goals and todos for this project are:
 
 ---
 
-![](https://raw.githubusercontent.com/loeiks/nzxt-web-integration/refs/heads/main/image.png)
+## Preview;
+
+![](https://raw.githubusercontent.com/loeiks/nzxt-web-integration/refs/heads/main/preview.png)
