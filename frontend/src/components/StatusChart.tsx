@@ -1,6 +1,8 @@
 import { ResponsiveContainer, PieChart, Pie, Cell, Label } from "recharts";
 import { ChartContainer } from "./ui/chart";
 import { useMemo } from "react";
+import { useSelector } from 'react-redux';
+import { RootState } from "../store";
 
 const chartConfig = {
     desktop: {
@@ -13,17 +15,21 @@ const chartConfig = {
     }
 };
 
-type StatusChartType = { sign: "°" | "%", data: number };
+type StatusChartType = { sign: "°" | "%" };
 
-function StatusChart({ sign, data }: StatusChartType) {
+function StatusChart({ sign }: StatusChartType) {
     // If sign is ° it's mean we are showing temp and it should stay on left side.
     const alignment = sign === "°" ? [270, 90, 24] : [-90, 90, -24];
     const currentCx = sign === "°" ? "96%" : "6%";
 
+    const { currentSource, pcData, s1Data } = useSelector((state: RootState) => state.cpu);
+    const { temp, usage } = currentSource === "PC" ? pcData : s1Data;
+    const currentData = sign === "°" ? temp : usage;
+
     const chartData = useMemo(() => [
-        { value: data, fill: "hsl(var(--chart-1))" },
-        { value: (100 - data), fill: "hsl(var(--chart-2))" },
-    ], [data]);
+        { value: (currentData < 15 ? 15 : currentData), fill: "hsl(var(--chart-1))" },
+        { value: (100 - currentData), fill: "hsl(var(--chart-2))" },
+    ], [currentData]);
 
     const renderLabel = ({ viewBox }: any) => {
         if (viewBox && "cx" in viewBox && "cy" in viewBox) {
@@ -37,7 +43,7 @@ function StatusChart({ sign, data }: StatusChartType) {
                         y={viewBox.cy + 3}
                         className="text-7xl font-bold fill-white text-center"
                     >
-                        {data.toString() + sign}
+                        {currentData.toString() + sign}
                     </tspan>
                 </text>
             );
@@ -47,7 +53,7 @@ function StatusChart({ sign, data }: StatusChartType) {
 
     return (
         <ChartContainer config={chartConfig} className={`min-h-[500px]`}>
-            <ResponsiveContainer height={"100%"}>
+            <ResponsiveContainer height={"100%"} debounce={2000}>
                 <PieChart width={500}>
                     <Pie
                         cx={currentCx}
@@ -57,6 +63,10 @@ function StatusChart({ sign, data }: StatusChartType) {
                         endAngle={alignment[1]}
                         innerRadius={130}
                         cornerRadius={99}
+                        isAnimationActive={true}
+                        animationDuration={1000}
+                        animationBegin={100}
+                        animationEasing="ease-in-out"
                     >
                         <Cell fill="hsl(var(--chart-2))" />
                     </Pie>
@@ -68,6 +78,10 @@ function StatusChart({ sign, data }: StatusChartType) {
                         endAngle={alignment[1]}
                         innerRadius={130}
                         cornerRadius={99}
+                        isAnimationActive={true}
+                        animationDuration={1000}
+                        animationBegin={100}
+                        animationEasing="ease-in-out"
                     >
                         {chartData.map((entry, index) => (
                             <Cell key={(index + 1).toString()} fill={entry.fill} />

@@ -167,3 +167,31 @@ RAM: ~7.48Mb
 _NGINX Service:_
 CPU: ~%0.01
 RAM: ~2.35Mb
+
+---
+
+Ooops!! I've made some optimizations wrong by listening CoPilot (stupid AI things happens always so expect this) then I went to install React Scan to catch optimization problems and fix them and it worked good enough tbh. Now let's take a look what I have done wrong:
+
+1. Instead of removing `useEffect` for NZXT listener I added `useEffect` back and removed `currentSource` from dependency array. I've also done the same for S1 usage collection with WS.
+2. I've made some tweaks to change how animations handled in `StatusChart.tsx` which might not impact to performance.
+3. I also added an `if else` in `cpuSlice.ts` because every time an update came from S1 data, we use dispatch to update data in Redux even if the data is same. With this `if else` it's not updated anymore if it's same. (I'm not sure if this is the best way to handle this, but after some research I couldn't find a better way that's actually working)
+4. In backend there was a BUG with goroutines which I fixed later on and currently it's working.
+
+Now let's take a look how is the usage after optimizations (app was running for 12h+)
+
+**On Client Side:**
+CPU: ~%?
+RAM: ~?
+
+**On Server Side:**
+_Backend Service:_
+CPU: ~%?
+RAM: ~?
+_Frontend Service:_
+CPU: ~%?
+RAM: ~?
+_NGINX Service:_
+CPU: ~%?
+RAM: ~?
+
+---

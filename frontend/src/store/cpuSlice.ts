@@ -17,14 +17,23 @@ const cpuSlice = createSlice({
     initialState,
     reducers: {
         updatePCData(state, action: PayloadAction<{ temp: number; usage: number }>) {
-            state.pcData = action.payload;
+            const { temp, usage } = action.payload;
+            const { pcData } = state;
+
+            if (pcData.temp != temp || pcData.usage != usage) {
+                state.pcData = action.payload
+            }
         },
         updateS1Data(state, action: PayloadAction<{ temp: number; usage: number }>) {
-            console.log(action.payload);
-            state.s1Data = action.payload;
+            const { temp, usage } = action.payload;
+            const { s1Data } = state;
+
+            if (s1Data.temp != temp || s1Data.usage != usage) {
+                state.s1Data = action.payload
+            }
         },
         toggleSource(state) {
-            state.currentSource = state.currentSource === 'PC' ? 'S1' : 'PC';
+            state.currentSource = state.currentSource === 'PC' ? 'S1' : 'PC'
         },
     },
 });
