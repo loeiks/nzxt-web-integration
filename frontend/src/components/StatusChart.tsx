@@ -26,7 +26,7 @@ function StatusChart({ sign }: StatusChartType) {
     const currentData = sign === "°" ? temp : usage;
 
     const chartData = [
-        { value: (currentData < 15 ? 15 : currentData), fill: "hsl(var(--chart-1))" },
+        { value: (currentData < 7 ? 7 : currentData), fill: "hsl(var(--chart-1))" },
         { value: (100 - currentData), fill: "hsl(var(--chart-2))" },
     ];
 
@@ -61,10 +61,8 @@ function StatusChart({ sign }: StatusChartType) {
                         startAngle={alignment[0]}
                         endAngle={alignment[1]}
                         innerRadius={130}
-                        cornerRadius={99}
-                        isAnimationActive={true}
+                        cornerRadius={10}
                         animationDuration={700}
-                        animationBegin={0}
                         animationEasing="ease-in-out"
                     >
                         <Cell fill="hsl(var(--chart-2))" />
@@ -76,10 +74,8 @@ function StatusChart({ sign }: StatusChartType) {
                         startAngle={alignment[0]}
                         endAngle={alignment[1]}
                         innerRadius={130}
-                        cornerRadius={99}
-                        isAnimationActive={true}
-                        animationDuration={1000}
-                        animationBegin={200}
+                        cornerRadius={10}
+                        animationDuration={500}
                         animationEasing="ease-in-out"
                     >
                         {chartData.map((entry, index) => (
