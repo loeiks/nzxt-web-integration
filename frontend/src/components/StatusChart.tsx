@@ -1,6 +1,5 @@
 import { ResponsiveContainer, PieChart, Pie, Cell, Label } from "recharts";
 import { ChartContainer } from "./ui/chart";
-import { useMemo } from "react";
 import { useSelector } from 'react-redux';
 import { RootState } from "../store";
 
@@ -26,10 +25,10 @@ function StatusChart({ sign }: StatusChartType) {
     const { temp, usage } = currentSource === "PC" ? pcData : s1Data;
     const currentData = sign === "°" ? temp : usage;
 
-    const chartData = useMemo(() => [
+    const chartData = [
         { value: (currentData < 15 ? 15 : currentData), fill: "hsl(var(--chart-1))" },
         { value: (100 - currentData), fill: "hsl(var(--chart-2))" },
-    ], [currentData]);
+    ];
 
     const renderLabel = ({ viewBox }: any) => {
         if (viewBox && "cx" in viewBox && "cy" in viewBox) {
@@ -64,8 +63,8 @@ function StatusChart({ sign }: StatusChartType) {
                         innerRadius={130}
                         cornerRadius={99}
                         isAnimationActive={true}
-                        animationDuration={1000}
-                        animationBegin={100}
+                        animationDuration={700}
+                        animationBegin={0}
                         animationEasing="ease-in-out"
                     >
                         <Cell fill="hsl(var(--chart-2))" />
@@ -80,7 +79,7 @@ function StatusChart({ sign }: StatusChartType) {
                         cornerRadius={99}
                         isAnimationActive={true}
                         animationDuration={1000}
-                        animationBegin={100}
+                        animationBegin={200}
                         animationEasing="ease-in-out"
                     >
                         {chartData.map((entry, index) => (
