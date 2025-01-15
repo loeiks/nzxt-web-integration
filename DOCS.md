@@ -183,19 +183,19 @@ Ooops!! I've made some optimizations wrong by listening CoPilot (stupid AI thing
 
 Now let's take a look how is the usage after optimizations (app was running for 12h+)
 
-**On Client Side:**
-CPU: ~%?
+**On Client Side:** <br>
+CPU: ~%? <br>
 RAM: ~?
 
-**On Server Side:**
-_Backend Service:_
-CPU: ~%?
-RAM: ~?
-_Frontend Service:_
-CPU: ~%?
-RAM: ~?
-_NGINX Service:_
-CPU: ~%?
+**On Server Side:** <br>
+_Backend Service:_ <br>
+CPU: ~%? <br>
+RAM: ~? <br>
+_Frontend Service:_ <br>
+CPU: ~%? <br>
+RAM: ~? <br>
+_NGINX Service:_ <br>
+CPU: ~%? <br>
 RAM: ~?
 
 ---
