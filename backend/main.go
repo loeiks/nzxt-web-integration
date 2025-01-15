@@ -61,15 +61,20 @@ func getCPUTemperature() (float64, error) {
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("Failed to upgrade connection: %v\n", err)
+		log.Printf("Failed to Upgrade Connection: %v\n", err)
 		return
 	}
+
+	go handleWebSocketConnection(conn)
+}
+
+func handleWebSocketConnection(conn *websocket.Conn) {
 	defer conn.Close()
 
-	log.Println("New WebSocket Client Connected!")
+	log.Println("New WebSocket client connected")
 
 	// Create a ticker for periodic updates
-	ticker := time.NewTicker(2500 * time.Millisecond)
+	ticker := time.NewTicker(2 * time.Second)
 	defer ticker.Stop()
 
 	// Create a channel to signal when the connection is closed
@@ -87,13 +92,13 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		case <-ticker.C:
 			cpuInfo, err := getCPUInfo()
 			if err != nil {
-				log.Printf("Error fetching CPU info: %v\n", err)
+				log.Printf("Error Fetching CPU Info: %v\n", err)
 				continue
 			}
 
 			err = conn.WriteJSON(cpuInfo)
 			if err != nil {
-				log.Printf("Error sending data to client: %v\n", err)
+				log.Printf("Error Sending Data to Client: %v\n", err)
 				return
 			}
 		case <-done:
@@ -104,13 +109,11 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 // Start WS Server
 func main() {
-	http.HandleFunc("/cpu", func(w http.ResponseWriter, r *http.Request) {
-		go wsHandler(w, r)
-	})
+	http.HandleFunc("/cpu", wsHandler)
 	port := ":8080"
 
-	log.Printf("Starting WebSocket Server on PORT %s...\n", port)
+	log.Printf("Starting WebSocket server on port %s...\n", port)
 	if err := http.ListenAndServe(port, nil); err != nil {
-		log.Fatalf("Server Failed to Start: %v\n", err)
+		log.Fatalf("Server failed to start: %v\n", err)
 	}
 }
