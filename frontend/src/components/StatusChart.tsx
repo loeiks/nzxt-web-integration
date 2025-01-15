@@ -1,5 +1,7 @@
 import { ResponsiveContainer, PieChart, Pie, Cell, Label } from "recharts";
 import { ChartContainer } from "./ui/chart";
+import { useMemo } from "react";
+
 const chartConfig = {
     desktop: {
         label: "Desktop",
@@ -18,10 +20,30 @@ function StatusChart({ sign, data }: StatusChartType) {
     const alignment = sign === "°" ? [270, 90, 24] : [-90, 90, -24];
     const currentCx = sign === "°" ? "96%" : "6%";
 
-    const chartData = [
+    const chartData = useMemo(() => [
         { value: data, fill: "hsl(var(--chart-1))" },
         { value: (100 - data), fill: "hsl(var(--chart-2))" },
-    ];
+    ], [data]);
+
+    const renderLabel = ({ viewBox }: any) => {
+        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+            return (
+                <text
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                >
+                    <tspan
+                        x={viewBox.cx - alignment[2]}
+                        y={viewBox.cy + 3}
+                        className="text-7xl font-bold fill-white text-center"
+                    >
+                        {data.toString() + sign}
+                    </tspan>
+                </text>
+            );
+        }
+        return null;
+    }
 
     return (
         <ChartContainer config={chartConfig} className={`min-h-[500px]`}>
@@ -50,26 +72,7 @@ function StatusChart({ sign, data }: StatusChartType) {
                         {chartData.map((entry, index) => (
                             <Cell key={(index + 1).toString()} fill={entry.fill} />
                         ))}
-                        <Label
-                            content={({ viewBox }) => {
-                                if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                                    return (
-                                        <text
-                                            textAnchor="middle"
-                                            dominantBaseline="middle"
-                                        >
-                                            <tspan // @ts-ignore
-                                                x={viewBox.cx - alignment[2]} // @ts-ignore
-                                                y={viewBox.cy + 3}
-                                                className="text-7xl font-bold fill-white text-center"
-                                            >
-                                                {data.toString() + sign}
-                                            </tspan>
-                                        </text>
-                                    );
-                                }
-                            }}
-                        />
+                        <Label content={renderLabel} />
                     </Pie>
                 </PieChart>
             </ResponsiveContainer>

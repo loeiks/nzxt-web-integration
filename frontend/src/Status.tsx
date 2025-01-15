@@ -12,28 +12,7 @@ const Status = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { currentSource, pcData, s1Data } = useSelector((state: RootState) => state.cpu);
 
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            dispatch(toggleSource());
-        }, 12000);
-
-        return () => clearInterval(intervalId);
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (currentSource === "S1") {
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                dispatch(updateS1Data({ temp: Number(data.temperature.toFixed(0)), usage: Number(data.usage.toFixed(0)) }));
-            };
-
-            ws.onclose = () => {
-                console.warn("WebSocket connection closed");
-            };
-        }
-    }, [currentSource, dispatch]);
-
-    useEffect(() => {
+    if (!window.nzxt) {
         window.nzxt = {
             v1: {
                 onMonitoringDataUpdate: (data: MonitoringData) => {
@@ -49,9 +28,38 @@ const Status = () => {
                 targetFps: 30
             }
         };
+    }
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            dispatch(toggleSource());
+        }, 12000);
+
+        return () => clearInterval(intervalId);
+    }, [dispatch]);
+
+    useEffect(() => {
+        const handleMessage = (event: MessageEvent) => {
+            if (currentSource === "S1") {
+                const data = JSON.parse(event.data);
+                dispatch(updateS1Data({ temp: Number(data.temperature.toFixed(0)), usage: Number(data.usage.toFixed(0)) }));
+            }
+        };
+
+        if (currentSource === "S1") {
+            ws.addEventListener('message', handleMessage);
+
+            ws.onclose = () => {
+                console.warn("WebSocket Connection Closed!");
+            };
+        }
+
+        return () => {
+            ws.removeEventListener('message', handleMessage);
+        };
     }, [currentSource, dispatch]);
 
-    return ( // There is weird gap that I don't understand why yet so I close it with margin for now...
+    return (
         <div className="flex flex-row justify-center h-[100vh] w-full ml-[-11px]">
             <div className='grid grid-cols-[auto,1fr,auto] h-full items-center gap-[30px]'>
                 <div className='col-start-1 col-end-2 place-self-center'>

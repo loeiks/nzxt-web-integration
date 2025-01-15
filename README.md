@@ -22,3 +22,5 @@ Next goals and todos for this project are:
 - [ ] Add lazy loading feature for containers to stop them when screen has turned off.
 
 ---
+
+![](https://raw.githubusercontent.com/loeiks/nzxt-web-integration/refs/heads/main/image.png)
