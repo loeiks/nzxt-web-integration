@@ -26,7 +26,7 @@ function StatusChart({ sign }: StatusChartType) {
     const currentData = sign === "°" ? temp : usage;
 
     const chartData = [
-        { value: (currentData < 7 ? 7 : currentData), fill: "hsl(var(--chart-1))" },
+        { value: (currentData < 7 && currentData > 0 ? 7 : currentData), fill: "hsl(var(--chart-1))" },
         { value: (100 - currentData), fill: "hsl(var(--chart-2))" },
     ];
 
