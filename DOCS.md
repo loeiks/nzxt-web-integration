@@ -184,18 +184,20 @@ Ooops!! I've made some optimizations wrong by listening CoPilot (stupid AI thing
 Now let's take a look how is the usage after optimizations (app was running for 12h+)
 
 **On Client Side:** <br>
-CPU: ~%? <br>
-RAM: ~?
+CPU: ~%2.3 <br>
+RAM: ~440Mb ✅
 
 **On Server Side:** <br>
 _Backend Service:_ <br>
-CPU: ~%? <br>
-RAM: ~? <br>
+CPU: ~%0.06 <br>
+RAM: ~4.1Mb <br>
 _Frontend Service:_ <br>
-CPU: ~%? <br>
-RAM: ~? <br>
+CPU: ~%0 <br>
+RAM: ~7.4Mb <br>
 _NGINX Service:_ <br>
-CPU: ~%? <br>
-RAM: ~?
+CPU: ~%0 <br>
+RAM: ~2.3Mb
+
+I think we fixed memory leak issue as well as optimized application generally about resource usage.
 
 ---
